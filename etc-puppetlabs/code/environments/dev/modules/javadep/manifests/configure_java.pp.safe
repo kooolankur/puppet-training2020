@@ -1,0 +1,30 @@
+# @summary A short summary of the purpose of this class
+#
+# A description of what this class does
+#
+# @example
+#   include javadep::configure_java
+class javadep::configure_java {
+
+  $service = $javadep::java_service
+  $location = $javadep::java_deploy_location 
+  $warfile =  $javadep::java_war_file
+
+  $javadep::java_packages.each |$package| {
+    notify {"This is installing - ${package}": }
+    package { "$package":
+      ensure => installed
+    }
+  }
+
+  Service {"$service":
+    ensure => "running",
+    require => Package["$service"]
+  }
+
+  File  {"${location}/${warfile}":
+     source => "puppet:///modules/javadep/${warfile}",
+     notify => Service["$service"]
+  }
+
+}
